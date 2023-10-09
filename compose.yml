@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+    banco:
+       image: 'mysql:latest'
+       container_name: 'banco'
+       command: --default-authentication-plugin=mysql_native_password
+       ports: 
+         - '3307:3307'
+       environment:
+         MYSQL_ROOT_PASSWORD: '123'
+         MYSQL_DATABASE: teste
+         MYSQL_USER: user
+         MYSQL_USER_PASSWORD: '321'
+       volumes:
+         - './data:/var/lib/mysql'
+       restart: always
+       networks:
+         my-network:
+           ipv4_address: '10.50.1.3'
+
+    web:
+      image: 'nginx:latest'
+      container_name: web
+      depends_on: 
+        - banco
+      ports:
+        - '8080:80'
+      volumes:
+        - './site:/usr/share/nginx/html'
+      restart: always
+      networks:
+        my-network:
+          ipv4_address: '10.50.1.4'
+
+networks:
+  my-network:
+    ipam:
+     config:
+       - subnet: '10.50.1.0/8'
